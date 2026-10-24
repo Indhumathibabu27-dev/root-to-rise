@@ -10,7 +10,7 @@ import type { Page } from '../types';
 export function DashboardPage({ onNavigate }: { onNavigate: (page: Page) => void }) {
   const { t } = useI18n();
   const { user } = useAuth();
-  const { entries } = useHistory();
+  const { entries, loading } = useHistory();
 
   const totalCalcs = entries.length;
   const uniqueCrops = new Set(entries.map((e) => e.crop)).size;
@@ -97,7 +97,12 @@ export function DashboardPage({ onNavigate }: { onNavigate: (page: Page) => void
           )}
         </div>
 
-        {entries.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-10">
+              <span className="w-6 h-6 border-2 border-brand-500 border-t-transparent rounded-full animate-spin" />
+              <span className="ml-3 text-sm text-gray-400">{t('loading')}</span>
+            </div>
+          ) : entries.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-10 text-center">
             <div className="w-16 h-16 rounded-full bg-gray-50 flex items-center justify-center mb-4">
               <History className="w-8 h-8 text-gray-300" />

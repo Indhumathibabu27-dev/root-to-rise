@@ -196,7 +196,9 @@ export function CalculatorPage({ onNavigate }: { onNavigate: (page: Page) => voi
     setTimeout(() => {
       const res = calculate(inputs);
       setResult(res);
-      addEntry(inputs, res);
+      addEntry(inputs, res).catch(() => {
+        // Error is surfaced via HistoryContext error state
+      });
       setCalculating(false);
     }, 500);
   }

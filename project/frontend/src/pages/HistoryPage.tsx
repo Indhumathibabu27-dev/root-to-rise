@@ -1,4 +1,4 @@
-import { History as HistoryIcon, Trash2, Eye, X, IndianRupee, TrendingUp } from 'lucide-react';
+import { History as HistoryIcon, Trash2, Eye, X, IndianRupee, TrendingUp, AlertCircle, Loader2, Info } from 'lucide-react';
 import { useState } from 'react';
 import { useI18n } from '../contexts/I18nContext';
 import { useHistory } from '../contexts/HistoryContext';
@@ -9,7 +9,7 @@ import type { HistoryEntry } from '../types';
 
 export function HistoryPage() {
   const { t } = useI18n();
-  const { entries, deleteEntry, clearHistory } = useHistory();
+  const { entries, loading, error, deleteEntry, clearHistory, refresh } = useHistory();
   const [viewEntry, setViewEntry] = useState<HistoryEntry | null>(null);
 
   return (
@@ -24,7 +24,42 @@ export function HistoryPage() {
         }
       />
 
-      {entries.length === 0 ? (
+      {/* Demo notice */}
+      {!loading && !error && entries.length > 0 && (
+        <div className="mb-4 rounded-xl bg-blue-50 border border-blue-100 px-4 py-2.5 flex items-start gap-3">
+          <Info size={16} className="text-blue-500 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-blue-800">{t('demoHistoryNote')}</p>
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <Card className="p-6 animate-fade-up">
+          <div className="flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
+              <AlertCircle size={32} className="text-red-400" />
+            </div>
+            <p className="text-sm font-medium text-gray-900 mb-1">{t('historyError')}</p>
+            <p className="text-sm text-gray-400 mb-4 max-w-sm">{error}</p>
+            <Button onClick={refresh} variant="outline" size="sm">
+              {t('retry')}
+            </Button>
+          </div>
+        </Card>
+      )}
+
+      {/* Loading state */}
+      {loading && !error && (
+        <Card className="p-12 animate-fade-up">
+          <div className="flex flex-col items-center justify-center text-center">
+            <Loader2 size={32} className="text-brand-400 animate-spin mb-4" />
+            <p className="text-sm text-gray-400">{t('loadingHistory')}</p>
+          </div>
+        </Card>
+      )}
+
+      {/* Empty state */}
+      {!loading && !error && entries.length === 0 && (
         <Card className="animate-fade-up">
           <EmptyState
             icon={<HistoryIcon size={36} />}
@@ -32,7 +67,10 @@ export function HistoryPage() {
             description={t('historyEmptyDesc')}
           />
         </Card>
-      ) : (
+      )}
+
+      {/* List */}
+      {!loading && !error && entries.length > 0 && (
         <>
           {/* Desktop table */}
           <Card className="hidden sm:block overflow-hidden animate-fade-up">
